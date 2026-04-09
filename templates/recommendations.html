@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendations - Anime Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="recommendations-section">
+        <h1>Recommended For You</h1>
+        <p class="subtitle">Based on your ratings and preferences</p>
+        
+        <div class="anime-grid" id="recommendationsGrid">
+            <!-- Populated by JavaScript -->
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/recommendations.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Watchlist - Anime Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="watchlist-section">
+        <h1>My Watchlist</h1>
+        
+        <div id="watchlistContainer">
+            <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="emptyState" style="display: none;">
+            <p>Your watchlist is empty. <a href="/search">Search for anime</a> to add some!</p>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/watchlist.js') }}"></script>
+{% endblock %}
