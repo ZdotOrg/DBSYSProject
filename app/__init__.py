@@ -5,9 +5,6 @@ Flask application factory for Anime Tracker
 from flask import Flask
 import os
 
-# Import SQLAlchemy instance
-from app.models import db as sqla_db
-
 def create_app(config_class='development'):
     """Application factory function to create and configure the Flask app"""
 
@@ -23,15 +20,15 @@ def create_app(config_class='development'):
     # Initialize raw PostgreSQL database (psycopg2)
     from app.database import init_db
     init_db(app)
-
-    # Initialize SQLAlchemy
-    sqla_db.init_app(app)
     
-    # Create tables if they don't exist (development only)
-    if app.config.get('DEBUG'):
-        with app.app_context():
-            sqla_db.create_all()
-            app.logger.info("SQLAlchemy tables created/verified")
+    # Test database connection on startup
+    with app.app_context():
+        try:
+            from app.database import query_db
+            result = query_db("SELECT COUNT(*) as count FROM anime", one=True)
+            app.logger.info(f" Database connected. Found {result['count']} anime.")
+        except Exception as e:
+            app.logger.error(f" Database connection failed: {e}")
 
     # Register blueprints
     from app.routes.main import main_bp
