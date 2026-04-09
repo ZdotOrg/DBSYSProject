@@ -22,7 +22,8 @@ INSERT INTO studios (name, mal_id) VALUES
 ('Studio Ghibli', 21),
 ('CloverWorks', 1835),
 ('David Production', 287),
-('White Fox', 314);
+('White Fox', 314)
+ON CONFLICT (name) DO NOTHING;
 
 -- Insert Producers
 INSERT INTO producers (name, mal_id) VALUES
@@ -35,7 +36,8 @@ INSERT INTO producers (name, mal_id) VALUES
 ('Sony Music Entertainment', 166),
 ('Kodansha', 10),
 ('TV Tokyo', 160),
-('Kadokawa', 1696);
+('Kadokawa', 1696)
+ON CONFLICT (name) DO NOTHING;
 
 -- ============================================================
 -- ANIME ENTRIES (50 Popular Anime)
@@ -145,7 +147,8 @@ INSERT INTO anime (mal_id, title, title_english, title_japanese, type, episodes,
 
 (10087, 'Fate/Zero', 'Fate/Zero', 'Fate/Zero', 'TV', 13, 'Finished Airing', '2011-10-02', '2011-12-25', '24 min per ep', 'R', 8.27, 750000, 145, 54, 'Seven mages summon heroic spirits to fight for the Holy Grail in a deadly battle royale.', 'Fall', 2011, 'https://cdn.myanimelist.net/images/anime/2/73199.jpg'),
 
-(11741, 'Fate/Zero 2nd Season', 'Fate/Zero 2nd Season', 'Fate/Zero 2ndシーズン', 'TV', 12, 'Finished Airing', '2012-04-08', '2012-06-24', '24 min per ep', 'R', 8.54, 720000, 71, 61, 'The Holy Grail War reaches its climax as alliances crumble and fates are decided.', 'Spring', 2012, 'https://cdn.myanimelist.net/images/anime/8/41077.jpg');
+(11741, 'Fate/Zero 2nd Season', 'Fate/Zero 2nd Season', 'Fate/Zero 2ndシーズン', 'TV', 12, 'Finished Airing', '2012-04-08', '2012-06-24', '24 min per ep', 'R', 8.54, 720000, 71, 61, 'The Holy Grail War reaches its climax as alliances crumble and fates are decided.', 'Spring', 2012, 'https://cdn.myanimelist.net/images/anime/8/41077.jpg')
+ON CONFLICT (mal_id) DO NOTHING;
 
 -- ============================================================
 -- ANIME-GENRE RELATIONSHIPS
