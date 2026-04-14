@@ -7,7 +7,7 @@ from app.database import query_db, execute_db
 # Create blueprint
 main_bp = Blueprint('main', __name__)
 
-
+# READ OPERATION
 @main_bp.route('/')
 def index():
     """Home page - displays featured/popular anime"""
@@ -30,6 +30,7 @@ def index():
         return render_template('index.html', anime_list=[], error=str(e))
 
 
+#READ OPERATION
 @main_bp.route('/search')
 def search():
     """Search page - search anime by title, genre, etc."""
@@ -38,6 +39,8 @@ def search():
         search_query = request.args.get('q', '').strip()
         genre_filter = request.args.get('genre', '')
         type_filter = request.args.get('type', '')
+        status_filter = request.args.get('status', '')
+        sort_by = request.args.get('sort', 'score_desc')
         
         # Base query
         query = """
@@ -68,7 +71,24 @@ def search():
             query += " AND a.type = %s"
             params.append(type_filter)
         
-        query += " ORDER BY a.score DESC NULLS LAST LIMIT 50"
+        # Add status filter
+        if status_filter:
+            query += " AND a.status = %s"
+            params.append(status_filter)
+        
+        # Add sorting
+        if sort_by == 'score_desc':
+            query += " ORDER BY a.score DESC NULLS LAST"
+        elif sort_by == 'score_asc':
+            query += " ORDER BY a.score ASC NULLS LAST"
+        elif sort_by == 'title_asc':
+            query += " ORDER BY a.title ASC"
+        elif sort_by == 'popularity':
+            query += " ORDER BY a.popularity ASC"
+        else:
+            query += " ORDER BY a.score DESC NULLS LAST"
+        
+        query += " LIMIT 50"
         
         # Execute query
         results = query_db(query, tuple(params))
@@ -79,13 +99,23 @@ def search():
         # Get all types for filter dropdown
         types = query_db("SELECT DISTINCT type FROM anime WHERE type IS NOT NULL ORDER BY type")
         
+        # Get all statuses for filter dropdown
+        statuses = query_db("SELECT DISTINCT status FROM anime WHERE status IS NOT NULL ORDER BY status")
+        
+        # Calculate result count
+        result_count = len(results)
+        
         return render_template('search.html', 
                              results=results,
                              genres=genres,
                              types=types,
+                             statuses=statuses,
                              search_query=search_query,
                              selected_genre=genre_filter,
-                             selected_type=type_filter)
+                             selected_type=type_filter,
+                             selected_status=status_filter,
+                             selected_sort=sort_by,
+                             result_count=result_count)
     
     except Exception as e:
         print(f"Error in search: {e}")
@@ -93,9 +123,12 @@ def search():
                              results=[], 
                              genres=[],
                              types=[],
+                             statuses=[],
+                             result_count=0,
                              error=str(e))
 
 
+# READ OPERATION
 @main_bp.route('/watchlist')
 def watchlist():
     """Watchlist page - displays user's anime list"""
@@ -145,6 +178,7 @@ def watchlist():
                              error=str(e))
 
 
+# READ OPERATION 
 @main_bp.route('/anime/<int:anime_id>')
 def anime_detail(anime_id):
     """Anime detail page"""
@@ -205,6 +239,8 @@ def recommendations():
 # API ROUTES (for AJAX requests)
 # ============================================================
 
+
+# READ OPERATION
 @main_bp.route('/api/anime/<int:anime_id>')
 def api_anime_detail(anime_id):
     """API endpoint to get anime details as JSON"""
@@ -224,6 +260,7 @@ def api_anime_detail(anime_id):
         return jsonify({'error': str(e)}), 500
 
 
+# READ OPERATION
 @main_bp.route('/api/search')
 def api_search():
     """API endpoint for search suggestions"""
