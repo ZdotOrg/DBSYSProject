@@ -1,45 +1,122 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Anime Tracker{% endblock %}
+{% block title %}Search Anime - Anime Tracker{% endblock %}
 
 {% block content %}
-<div class="container">
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Welcome to Your Anime Tracker</h1>
-        <p>Track, rate, and discover your next favorite anime</p>
+<div class="search-section">
+    <h1 class="section-title">Search Anime</h1>
+    
+    <!-- Search Form -->
+    <form method="GET" action="{{ url_for('main.search') }}" class="search-form">
+        <div class="form-row">
+            <input 
+                type="text" 
+                name="q" 
+                class="form-input" 
+                placeholder="Search by title..." 
+                value="{{ search_query }}"
+            >
+            
+            <select name="genre" class="form-select">
+                <option value="">All Genres</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.name }}" {% if selected_genre == genre.name %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <select name="type" class="form-select">
+                <option value="">All Types</option>
+                {% for type in types %}
+                    <option value="{{ type.type }}" {% if selected_type == type.type %}selected{% endif %}>
+                        {{ type.type }}
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                {% for status in statuses %}
+                    <option value="{{ status.status }}" {% if selected_status == status.status %}selected{% endif %}>
+                        {{ status.status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
         
-        <!-- User Stats -->
-        <div class="stats-grid" id="userStats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalAnime">0</div>
-                <div class="stat-label">Total Anime</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="completedCount">0</div>
-                <div class="stat-label">Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="watchingCount">0</div>
-                <div class="stat-label">Watching</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avgRating">0.0</div>
-                <div class="stat-label">Avg Rating</div>
-            </div>
+        <div class="form-row">
+            <select name="sort" class="form-select">
+                <option value="score_desc" {% if selected_sort == 'score_desc' %}selected{% endif %}>
+                    Score: High to Low
+                </option>
+                <option value="score_asc" {% if selected_sort == 'score_asc' %}selected{% endif %}>
+                    Score: Low to High
+                </option>
+                <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>
+                    Title: A-Z
+                </option>
+                <option value="popularity" {% if selected_sort == 'popularity' %}selected{% endif %}>
+                    Popularity
+                </option>
+            </select>
+            
+            <button type="submit" class="form-button">Search</button>
         </div>
-    </section>
-
-    <!-- Featured Anime -->
-    <section class="anime-section">
-        <h2>Popular Anime</h2>
-        <div class="anime-grid" id="popularAnime">
-            <!-- Populated by JavaScript -->
+    </form>
+    
+    <!-- Results Count -->
+    {% if error %}
+        <div class="error-message">
+            <p>Error loading results: {{ error }}</p>
         </div>
-    </section>
+    {% else %}
+        <div class="results-count">
+            {% if result_count > 0 %}
+                <p>Found {{ result_count }} result{% if result_count != 1 %}s{% endif %}</p>
+            {% else %}
+                <p class="no-results-text">No results found. Try adjusting your filters.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Results Grid -->
+        {% if results %}
+            <div class="results-grid">
+                {% for anime in results %}
+                <div class="anime-card">
+                    <div class="anime-image">
+                        {% if anime.image_url %}
+                            <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="anime-info">
+                        <h3 class="anime-title">{{ anime.title }}</h3>
+                        <div class="anime-meta">
+                            {% if anime.score %}
+                            <span class="anime-score">⭐ {{ anime.score }}</span>
+                            {% endif %}
+                            {% if anime.type %}
+                            <span class="anime-type">{{ anime.type }}</span>
+                            {% endif %}
+                            {% if anime.episodes %}
+                            <span class="anime-episodes">{{ anime.episodes }} eps</span>
+                            {% endif %}
+                        </div>
+                        <p class="anime-synopsis">
+                            {% if anime.synopsis %}
+                                {{ anime.synopsis[:150] }}{% if anime.synopsis|length > 150 %}...{% endif %}
+                            {% else %}
+                                No synopsis available.
+                            {% endif %}
+                        </p>
+                        <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

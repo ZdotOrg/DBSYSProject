@@ -1,23 +1,488 @@
 {% extends "base.html" %}
 
-{% block title %}Watchlist - Anime Tracker{% endblock %}
+{% block title %}My Watchlist - Anime Tracker{% endblock %}
 
 {% block content %}
-<div class="container">
-    <section class="watchlist-section">
-        <h1>My Watchlist</h1>
-        
-        <div id="watchlistContainer">
-            <!-- Populated by JavaScript -->
+<div class="watchlist-section">
+    <h1 class="section-title">My Watchlist</h1>
+    
+    <!-- Watchlist Stats -->
+    <div class="watchlist-stats">
+        <div class="stat-card">
+            <span class="stat-value">{{ total_count }}</span>
+            <span class="stat-label">Total Anime</span>
         </div>
-
-        <div id="emptyState" style="display: none;">
-            <p>Your watchlist is empty. <a href="/search">Search for anime</a> to add some!</p>
+        <div class="stat-card">
+            <span class="stat-value">{{ watching|length }}</span>
+            <span class="stat-label">Watching</span>
         </div>
-    </section>
+        <div class="stat-card">
+            <span class="stat-value">{{ completed|length }}</span>
+            <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ plan_to_watch|length }}</span>
+            <span class="stat-label">Plan to Watch</span>
+        </div>
+    </div>
+    
+    {% if error %}
+        <div class="error-message">
+            <p>Error loading watchlist: {{ error }}</p>
+        </div>
+    {% endif %}
+    
+    <!-- Status Tabs -->
+    <div class="watchlist-tabs">
+        <button class="tab-btn active" data-tab="watching">
+            Watching <span class="tab-count">{{ watching|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="completed">
+            Completed <span class="tab-count">{{ completed|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="plan">
+            Plan to Watch <span class="tab-count">{{ plan_to_watch|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="onhold">
+            On Hold <span class="tab-count">{{ on_hold|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="dropped">
+            Dropped <span class="tab-count">{{ dropped|length }}</span>
+        </button>
+    </div>
+    
+    <!-- Watching Tab Content -->
+    <div id="watching" class="tab-content active">
+        {% if watching %}
+            <div class="watchlist-grid">
+                {% for item in watching %}
+                <div class="watchlist-card" data-list-id="{{ item.list_id }}">
+                    <div class="watchlist-image">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="watchlist-info">
+                        <h3 class="watchlist-title">{{ item.title }}</h3>
+                        {% if item.title_english and item.title_english != item.title %}
+                            <p class="watchlist-title-jp">{{ item.title_english }}</p>
+                        {% endif %}
+                        
+                        <div class="watchlist-meta">
+                            {% if item.type %}
+                            <span class="watchlist-type">{{ item.type }}</span>
+                            {% endif %}
+                            {% if item.episodes %}
+                            <span class="watchlist-episodes">{{ item.episodes_watched }}/{{ item.episodes }} eps</span>
+                            {% endif %}
+                            {% if item.user_score %}
+                            <span class="watchlist-score">⭐ {{ item.user_score }}/10</span>
+                            {% endif %}
+                        </div>
+                        
+                        
+                        
+                        {% if item.notes %}
+                        <p class="watchlist-notes">
+                            <i class="note-icon">📝</i> {{ item.notes[:100] }}{% if item.notes|length > 100 %}...{% endif %}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="watchlist-actions">
+                            <a href="{{ url_for('main.anime_detail', anime_id=item.anime_id) }}" class="view-details">View Details</a>
+                            <button class="edit-watchlist-btn" data-list-id="{{ item.list_id }}">Edit</button>
+                            <button class="remove-watchlist-btn" data-list-id="{{ item.list_id }}">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p class="empty-state-text">No anime currently watching.</p>
+                <a href="{{ url_for('main.search') }}" class="form-button">Browse Anime</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Completed Tab Content -->
+    <div id="completed" class="tab-content">
+        {% if completed %}
+            <div class="watchlist-grid">
+                {% for item in completed %}
+                <div class="watchlist-card">
+                    <div class="watchlist-image">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="watchlist-info">
+                        <h3 class="watchlist-title">{{ item.title }}</h3>
+                        {% if item.title_english and item.title_english != item.title %}
+                            <p class="watchlist-title-jp">{{ item.title_english }}</p>
+                        {% endif %}
+                        
+                        <div class="watchlist-meta">
+                            {% if item.type %}
+                            <span class="watchlist-type">{{ item.type }}</span>
+                            {% endif %}
+                            {% if item.episodes %}
+                            <span class="watchlist-episodes">{{ item.episodes }} eps</span>
+                            {% endif %}
+                            {% if item.user_score %}
+                            <span class="watchlist-score">⭐ {{ item.user_score }}/10</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if item.notes %}
+                        <p class="watchlist-notes">
+                            <i class="note-icon">📝</i> {{ item.notes[:100] }}{% if item.notes|length > 100 %}...{% endif %}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="watchlist-actions">
+                            <a href="{{ url_for('main.anime_detail', anime_id=item.anime_id) }}" class="view-details">View Details</a>
+                            <button class="edit-watchlist-btn" data-list-id="{{ item.list_id }}">Edit</button>
+                            <button class="remove-watchlist-btn" data-list-id="{{ item.list_id }}">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p class="empty-state-text">No completed anime yet.</p>
+                <a href="{{ url_for('main.search') }}" class="form-button">Browse Anime</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Plan to Watch Tab Content -->
+    <div id="plan" class="tab-content">
+        {% if plan_to_watch %}
+            <div class="watchlist-grid">
+                {% for item in plan_to_watch %}
+                <div class="watchlist-card">
+                    <div class="watchlist-image">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="watchlist-info">
+                        <h3 class="watchlist-title">{{ item.title }}</h3>
+                        {% if item.title_english and item.title_english != item.title %}
+                            <p class="watchlist-title-jp">{{ item.title_english }}</p>
+                        {% endif %}
+                        
+                        <div class="watchlist-meta">
+                            {% if item.type %}
+                            <span class="watchlist-type">{{ item.type }}</span>
+                            {% endif %}
+                            {% if item.episodes %}
+                            <span class="watchlist-episodes">{{ item.episodes }} eps</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="watchlist-actions">
+                            <a href="{{ url_for('main.anime_detail', anime_id=item.anime_id) }}" class="view-details">View Details</a>
+                            <button class="edit-watchlist-btn" data-list-id="{{ item.list_id }}">Edit</button>
+                            <button class="remove-watchlist-btn" data-list-id="{{ item.list_id }}">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p class="empty-state-text">No anime in your plan to watch list.</p>
+                <a href="{{ url_for('main.search') }}" class="form-button">Browse Anime</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- On Hold Tab Content -->
+    <div id="onhold" class="tab-content">
+        {% if on_hold %}
+            <div class="watchlist-grid">
+                {% for item in on_hold %}
+                <div class="watchlist-card">
+                    <div class="watchlist-image">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="watchlist-info">
+                        <h3 class="watchlist-title">{{ item.title }}</h3>
+                        {% if item.title_english and item.title_english != item.title %}
+                            <p class="watchlist-title-jp">{{ item.title_english }}</p>
+                        {% endif %}
+                        
+                        <div class="watchlist-meta">
+                            {% if item.type %}
+                            <span class="watchlist-type">{{ item.type }}</span>
+                            {% endif %}
+                            {% if item.episodes %}
+                            <span class="watchlist-episodes">{{ item.episodes }} eps</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="watchlist-actions">
+                            <a href="{{ url_for('main.anime_detail', anime_id=item.anime_id) }}" class="view-details">View Details</a>
+                            <button class="edit-watchlist-btn" data-list-id="{{ item.list_id }}">Edit</button>
+                            <button class="remove-watchlist-btn" data-list-id="{{ item.list_id }}">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p class="empty-state-text">No anime on hold.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Dropped Tab Content -->
+    <div id="dropped" class="tab-content">
+        {% if dropped %}
+            <div class="watchlist-grid">
+                {% for item in dropped %}
+                <div class="watchlist-card">
+                    <div class="watchlist-image">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="watchlist-info">
+                        <h3 class="watchlist-title">{{ item.title }}</h3>
+                        {% if item.title_english and item.title_english != item.title %}
+                            <p class="watchlist-title-jp">{{ item.title_english }}</p>
+                        {% endif %}
+                        
+                        <div class="watchlist-meta">
+                            {% if item.type %}
+                            <span class="watchlist-type">{{ item.type }}</span>
+                            {% endif %}
+                            {% if item.episodes %}
+                            <span class="watchlist-episodes">{{ item.episodes }} eps</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if item.notes %}
+                        <p class="watchlist-notes">
+                            <i class="note-icon">📝</i> {{ item.notes[:100] }}{% if item.notes|length > 100 %}...{% endif %}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="watchlist-actions">
+                            <a href="{{ url_for('main.anime_detail', anime_id=item.anime_id) }}" class="view-details">View Details</a>
+                            <button class="edit-watchlist-btn" data-list-id="{{ item.list_id }}">Edit</button>
+                            <button class="remove-watchlist-btn" data-list-id="{{ item.list_id }}">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p class="empty-state-text">No dropped anime.</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/watchlist.js') }}"></script>
+<!-- Edit Watchlist Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Watchlist Item</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editWatchlistForm">
+                <input type="hidden" id="edit_list_id" name="list_id">
+                
+                <div class="form-group">
+                    <label for="watch_status">Status:</label>
+                    <select id="watch_status" name="watch_status" class="form-select" required>
+                        <option value="Watching">Watching</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Plan to Watch">Plan to Watch</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Dropped">Dropped</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user_score">Your Score (0-10):</label>
+                    <select id="user_score" name="user_score" class="form-select">
+                        <option value="">Not rated</option>
+                        <option value="10">10 - Masterpiece</option>
+                        <option value="9">9 - Excellent</option>
+                        <option value="8">8 - Great</option>
+                        <option value="7">7 - Good</option>
+                        <option value="6">6 - Fine</option>
+                        <option value="5">5 - Average</option>
+                        <option value="4">4 - Bad</option>
+                        <option value="3">3 - Very Bad</option>
+                        <option value="2">2 - Horrible</option>
+                        <option value="1">1 - Unwatchable</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="episodes_watched">Episodes Watched:</label>
+                    <input type="number" id="episodes_watched" name="episodes_watched" 
+                           class="form-input" min="0" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes:</label>
+                    <textarea id="notes" name="notes" class="form-input" rows="3" 
+                              placeholder="Your personal notes about this anime..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="form-button">Save Changes</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching functionality
+document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+        
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        button.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    });
+});
+
+// Edit modal functionality
+const modal = document.getElementById('editModal');
+const closeModal = document.querySelector('.close-modal');
+const cancelBtn = document.querySelector('.cancel-btn');
+
+document.querySelectorAll('.edit-watchlist-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const listId = btn.getAttribute('data-list-id');
+        
+        // Fetch current watchlist item data
+        try {
+            const response = await fetch(`/api/watchlist/${listId}`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                document.getElementById('edit_list_id').value = data.list_id;
+                document.getElementById('watch_status').value = data.watch_status;
+                document.getElementById('user_score').value = data.user_score || '';
+                document.getElementById('episodes_watched').value = data.episodes_watched || 0;
+                document.getElementById('notes').value = data.notes || '';
+                
+                modal.style.display = 'block';
+            } else {
+                alert('Error loading watchlist item data');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error loading watchlist item data');
+        }
+    });
+});
+
+// Close modal
+function closeModalFunc() {
+    modal.style.display = 'none';
+}
+
+closeModal?.addEventListener('click', closeModalFunc);
+cancelBtn?.addEventListener('click', closeModalFunc);
+
+window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+        closeModalFunc();
+    }
+});
+
+// Handle form submission
+document.getElementById('editWatchlistForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        list_id: document.getElementById('edit_list_id').value,
+        watch_status: document.getElementById('watch_status').value,
+        user_score: document.getElementById('user_score').value || null,
+        episodes_watched: document.getElementById('episodes_watched').value,
+        notes: document.getElementById('notes').value
+    };
+    
+    try {
+        const response = await fetch('/api/watchlist/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Watchlist updated successfully!');
+            location.reload(); // Refresh to show updated data
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error updating watchlist');
+    }
+});
+
+// Remove from watchlist
+document.querySelectorAll('.remove-watchlist-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to remove this anime from your watchlist?')) {
+            const listId = btn.getAttribute('data-list-id');
+            
+            try {
+                const response = await fetch(`/api/watchlist/remove/${listId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Removed from watchlist');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error removing from watchlist');
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

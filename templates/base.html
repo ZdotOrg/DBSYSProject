@@ -7,35 +7,31 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="container">
+        <div class="nav-container">
             <div class="nav-brand">
-                <a href="/">🎌 Anime Tracker</a>
+                <a href="{{ url_for('main.index') }}">Anime Tracker</a>
             </div>
             <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/search" class="nav-link">Search</a>
-                <a href="/watchlist" class="nav-link">My Watchlist</a>
-                <a href="/recommendations" class="nav-link">Recommendations</a>
+                <a href="{{ url_for('main.index') }}">Home</a>
+                <a href="{{ url_for('main.search') }}">Search</a>
+                <a href="{{ url_for('main.watchlist') }}">Watchlist</a>
+                <a href="{{ url_for('main.recommendations') }}">Recommendations</a>
             </div>
         </div>
     </nav>
-
+ 
     <!-- Main Content -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
-
+ 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Anime Tracker | Database Systems Project</p>
+        <div class="footer-container">
+            <p>&copy; 2024 Anime Tracker. All rights reserved.</p>
         </div>
     </footer>
-
-    <!-- Base JavaScript -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block scripts %}{% endblock %}
 </body>
 </html>
