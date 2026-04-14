@@ -35,7 +35,12 @@ def create_app(config_class='development'):
 
     # Register blueprints
     from app.routes.main import main_bp
+    from app.routes.watchlist import watchlist_bp
+    from app.routes.recommendations import recommendations_bp
+    
     app.register_blueprint(main_bp)
+    app.register_blueprint(watchlist_bp)
+    app.register_blueprint(recommendations_bp)
 
     # Log startup
     app.logger.info(f"Anime Tracker started with {config_class} config")
