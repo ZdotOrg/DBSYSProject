@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ anime.title }} - Anime Tracker{% endblock %}
+
+{% block content %}
+<div class="anime-detail-section">
+    <!-- Hero Section -->
+    <div class="anime-hero">
+        {% if anime.image_url %}
+        <div class="hero-background" style="background-image: url('{{ anime.image_url }}');"></div>
+        {% endif %}
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content">
+            <div class="hero-poster">
+                {% if anime.image_url %}
+                    <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+                {% else %}
+                    <div class="no-image-large">No Image</div>
+                {% endif %}
+            </div>
+            
+            <div class="hero-info">
+                <h1 class="detail-title">{{ anime.title }}</h1>
+                
+                {% if anime.title_english and anime.title_english != anime.title %}
+                <p class="detail-title-alt">{{ anime.title_english }}</p>
+                {% endif %}
+                
+                <div class="detail-meta-row">
+                    {% if anime.score %}
+                    <div class="detail-score-big">
+                        <span class="score-number">{{ anime.score }}</span>
+                        <span class="score-label">⭐ Score</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="detail-tags">
+                    {% if anime.type %}
+                    <span class="tag tag-type">{{ anime.type }}</span>
+                    {% endif %}
+                    
+                    {% if anime.status %}
+                    <span class="tag tag-status">{{ anime.status }}</span>
+                    {% endif %}
+                    
+                    {% if anime.episodes %}
+                    <span class="tag tag-episodes">{{ anime.episodes }} Episodes</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="detail-container">
+        <!-- Left Column: Synopsis -->
+        <div class="detail-main">
+            <div class="detail-card">
+                <h2 class="card-title">Synopsis</h2>
+                {% if anime.synopsis %}
+                <p class="synopsis-text">{{ anime.synopsis }}</p>
+                {% else %}
+                <p class="synopsis-text text-muted">No synopsis available.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Right Sidebar: Basic Info -->
+        <div class="detail-sidebar">
+            <div class="detail-card">
+                <h3 class="sidebar-title">Information</h3>
+                
+                <div class="info-row">
+                    <span class="info-label">Type:</span>
+                    <span class="info-value">{{ anime.type or 'Unknown' }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Episodes:</span>
+                    <span class="info-value">{{ anime.episodes or 'Unknown' }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">{{ anime.status or 'Unknown' }}</span>
+                </div>
+                
+                {% if anime.season and anime.year %}
+                <div class="info-row">
+                    <span class="info-label">Premiered:</span>
+                    <span class="info-value">{{ anime.season }} {{ anime.year }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Genres -->
+            {% if genres %}
+            <div class="detail-card">
+                <h3 class="sidebar-title">Genres</h3>
+                <div class="tag-cloud">
+                    {% for genre in genres %}
+                    <span class="tag tag-genre">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
