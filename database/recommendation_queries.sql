@@ -1,7 +1,7 @@
 -- ============================================================
--- ANIME RECOMMENDATION ALGORITHM - FIXED VERSION
+-- ANIME RECOMMENDATION ALGORITHM 
 -- Content-Based Filtering using SQL
--- No Time Decay (Option C)
+-- No Time Decay 
 -- ============================================================
 
 -- ============================================================
