@@ -34,7 +34,7 @@ import requests
 from flask import Blueprint, request, jsonify, current_app
 
 # Create blueprint
-details_bp = Blueprint('jikan_details', __name__, url_prefix='/api/jikan')
+details_bp = Blueprint('jikan_details', __name__)
 
 
 # ============================================================
