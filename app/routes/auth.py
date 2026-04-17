@@ -51,10 +51,10 @@ def login():
             session['username'] = user['username']
 
             # Update last_login timestamp
-            execute_db(
-                "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = %s",
-                (user['user_id'],)
-            )
+        #    execute_db(
+         #       "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = %s",
+          #      (user['user_id'],)
+           # )
 
             flash(f"Welcome back, {user['username']}!", 'success')
             # Redirect to the page they were trying to visit, or home

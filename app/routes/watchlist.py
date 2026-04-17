@@ -6,9 +6,8 @@ from app.database import query_db, execute_db
 from datetime import datetime
 from functools import wraps
 
-# Create blueprint
+# Create blueprint - NO prefix needed
 watchlist_bp = Blueprint('watchlist', __name__)
-
 
 # ============================================================
 # AUTHENTICATION DECORATOR
@@ -23,18 +22,14 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
 # ============================================================
-# WATCHLIST STATUS CHECK (NEEDED FOR ANIME DETAIL PAGE)
+# WATCHLIST STATUS CHECK
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/status/<int:anime_id>')
+@watchlist_bp.route('/status/<int:anime_id>')  # Changed from /api/watchlist/status/
 @login_required
 def get_watchlist_status(anime_id):
-    """
-    GET - Check if anime is in user's watchlist
-    Used by anime detail page to show correct button state
-    """
+    """GET - Check if anime is in user's watchlist"""
     try:
         user_id = session.get('user_id')
         
@@ -60,24 +55,18 @@ def get_watchlist_status(anime_id):
         print(f"Error checking watchlist status: {e}")
         return jsonify({'error': str(e)}), 500
 
-
 # ============================================================
-# SIMPLE ADD/UPDATE (USED BY ANIME DETAIL PAGE BUTTON)
+# SIMPLE ADD/UPDATE
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/add', methods=['POST'])
+@watchlist_bp.route('/add', methods=['POST'])  # Changed from /api/watchlist/add
 @login_required
 def add_to_watchlist_simple():
-    """
-    POST - Simple add/update from anime detail page
-    Expected JSON: {anime_id, status?}
-    If anime exists, updates status; if not, creates new entry
-    """
+    """POST - Simple add/update from anime detail page"""
     try:
         user_id = session.get('user_id')
         data = request.get_json()
         
-        # Validate required fields
         if not data.get('anime_id'):
             return jsonify({'success': False, 'error': 'anime_id is required'}), 400
         
@@ -127,18 +116,14 @@ def add_to_watchlist_simple():
         print(f"Error adding to watchlist: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-
 # ============================================================
-# GET SINGLE WATCHLIST ITEM (FOR EDIT MODAL)
+# GET SINGLE WATCHLIST ITEM
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/item/<int:list_id>')
+@watchlist_bp.route('/item/<int:list_id>')  # Changed from /api/watchlist/item/
 @login_required
 def get_watchlist_item(list_id):
-    """
-    GET single watchlist item by list_id
-    Used by the edit modal to populate current values
-    """
+    """GET single watchlist item by list_id"""
     try:
         user_id = session.get('user_id')
         
@@ -156,7 +141,6 @@ def get_watchlist_item(list_id):
         if not item:
             return jsonify({'error': 'Watchlist item not found'}), 404
         
-        # Convert dates to strings for JSON serialization
         result = dict(item)
         if result.get('start_date'):
             result['start_date'] = result['start_date'].isoformat()
@@ -169,23 +153,18 @@ def get_watchlist_item(list_id):
         print(f"Error getting watchlist item: {e}")
         return jsonify({'error': str(e)}), 500
 
-
 # ============================================================
-# DETAILED ADD (FOR WATCHLIST PAGE WITH ALL FIELDS)
+# DETAILED ADD
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/add-detailed', methods=['POST'])
+@watchlist_bp.route('/add-detailed', methods=['POST'])  # Changed from /api/watchlist/add-detailed
 @login_required
 def add_to_watchlist_detailed():
-    """
-    POST - Add anime with full details (from watchlist page)
-    Expected JSON: {anime_id, watch_status, user_score?, episodes_watched?, notes?}
-    """
+    """POST - Add anime with full details"""
     try:
         user_id = session.get('user_id')
         data = request.get_json()
         
-        # Validate required fields
         if not data.get('anime_id'):
             return jsonify({'error': 'anime_id is required'}), 400
         
@@ -197,7 +176,6 @@ def add_to_watchlist_detailed():
         start_date = data.get('start_date')
         finish_date = data.get('finish_date')
         
-        # Check if already in watchlist
         existing = query_db("""
             SELECT list_id FROM user_anime_list 
             WHERE user_id = %s AND anime_id = %s
@@ -206,7 +184,6 @@ def add_to_watchlist_detailed():
         if existing:
             return jsonify({'error': 'Anime already in watchlist'}), 400
         
-        # Insert into watchlist
         result = execute_db("""
             INSERT INTO user_anime_list 
             (user_id, anime_id, watch_status, user_score, episodes_watched, 
@@ -229,23 +206,18 @@ def add_to_watchlist_detailed():
         print(f"Error adding detailed watchlist item: {e}")
         return jsonify({'error': str(e)}), 500
 
-
 # ============================================================
 # UPDATE WATCHLIST ITEM
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/update', methods=['POST'])
+@watchlist_bp.route('/update', methods=['POST'])  # Changed from /api/watchlist/update
 @login_required
 def update_watchlist():
-    """
-    POST - Update existing watchlist entry
-    Expected JSON: {list_id, watch_status, user_score?, episodes_watched?, notes?}
-    """
+    """POST - Update existing watchlist entry"""
     try:
         user_id = session.get('user_id')
         data = request.get_json()
         
-        # Validate required fields
         if not data.get('list_id'):
             return jsonify({'error': 'list_id is required'}), 400
         
@@ -257,7 +229,6 @@ def update_watchlist():
         start_date = data.get('start_date')
         finish_date = data.get('finish_date')
         
-        # Verify ownership
         existing = query_db("""
             SELECT list_id FROM user_anime_list 
             WHERE list_id = %s AND user_id = %s
@@ -266,7 +237,6 @@ def update_watchlist():
         if not existing:
             return jsonify({'error': 'Watchlist item not found or unauthorized'}), 404
         
-        # Update watchlist entry
         rows_affected = execute_db("""
             UPDATE user_anime_list
             SET watch_status = %s,
@@ -292,21 +262,17 @@ def update_watchlist():
         print(f"Error updating watchlist: {e}")
         return jsonify({'error': str(e)}), 500
 
-
 # ============================================================
 # REMOVE FROM WATCHLIST
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/remove/<int:list_id>', methods=['DELETE'])
+@watchlist_bp.route('/remove/<int:list_id>', methods=['DELETE'])  # Changed from /api/watchlist/remove/
 @login_required
 def remove_from_watchlist(list_id):
-    """
-    DELETE - Remove anime from watchlist by list_id
-    """
+    """DELETE - Remove anime from watchlist by list_id"""
     try:
         user_id = session.get('user_id')
         
-        # Verify ownership before deleting
         existing = query_db("""
             SELECT list_id FROM user_anime_list 
             WHERE list_id = %s AND user_id = %s
@@ -315,7 +281,6 @@ def remove_from_watchlist(list_id):
         if not existing:
             return jsonify({'error': 'Watchlist item not found or unauthorized'}), 404
         
-        # Delete the entry
         rows_affected = execute_db("""
             DELETE FROM user_anime_list
             WHERE list_id = %s AND user_id = %s
@@ -333,18 +298,14 @@ def remove_from_watchlist(list_id):
         print(f"Error removing from watchlist: {e}")
         return jsonify({'error': str(e)}), 500
 
-
 # ============================================================
-# REMOVE BY ANIME ID (FOR ANIME DETAIL PAGE)
+# REMOVE BY ANIME ID
 # ============================================================
 
-@watchlist_bp.route('/api/watchlist/remove-by-anime', methods=['POST'])
+@watchlist_bp.route('/remove-by-anime', methods=['POST'])  # Changed from /api/watchlist/remove-by-anime
 @login_required
 def remove_by_anime_id():
-    """
-    POST - Remove anime from watchlist by anime_id
-    Expected JSON: {anime_id}
-    """
+    """POST - Remove anime from watchlist by anime_id"""
     try:
         user_id = session.get('user_id')
         data = request.get_json()
@@ -354,7 +315,6 @@ def remove_by_anime_id():
         
         anime_id = data.get('anime_id')
         
-        # Delete the entry
         rows_affected = execute_db("""
             DELETE FROM user_anime_list
             WHERE user_id = %s AND anime_id = %s

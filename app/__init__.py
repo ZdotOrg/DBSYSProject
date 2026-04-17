@@ -43,9 +43,9 @@ def create_app(config_class='development'):
 
     
     app.register_blueprint(main_bp)
-    app.register_blueprint(watchlist_bp)
-    app.register_blueprint(recommendations_bp)
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(watchlist_bp, url_prefix='/watchlist')
+    app.register_blueprint(recommendations_bp, url_prefix='/recommendations')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(jikan_bp, url_prefix='/api/jikan')
     app.register_blueprint(details_bp, url_prefix='/api/jikan/details')
 
