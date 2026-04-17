@@ -37,7 +37,7 @@ from populate_database import (
 )
 
 # Create blueprint
-jikan_bp = Blueprint('jikan', __name__, url_prefix='/api/jikan')
+jikan_bp = Blueprint('jikan', __name__)
 
 
 # ============================================================
