@@ -5,6 +5,13 @@
 <!-- PAGE SPECIFIC CSS -->
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+
+{% endblock %}
+
+<!-- Page-specific JavaScript -->
+{% block extra_js %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -12,9 +19,9 @@
     <h1 class="section-title">Search Anime</h1>
 
     <!-- Search Form -->
-    <form method="GET" action="{{ url_for('main.search') }}" class="search-form">
+    <form method="GET" action="{{ url_for('main.search') }}" class="search-form" id="searchForm">
         <div class="form-row">
-            <input type="text" name="q" class="form-input" placeholder="Search by title..." value="{{ search_query }}">
+            <input type="text" name="q" id="searchQuery" class="form-input" placeholder="Search by title..." value="{{ search_query }}">
 
             <select name="genre" class="form-select">
                 <option value="">All Genres</option>
@@ -60,11 +67,11 @@
                 </option>
             </select>
 
-            <button type="submit" class="form-button">Search</button>
+            <button type="submit" class="form-button">Search Database</button>
         </div>
     </form>
 
-    <!-- Results Count -->
+    <!-- Database Results Count -->
     {% if error %}
     <div class="error-message">
         <p>Error loading results: {{ error }}</p>
@@ -72,13 +79,13 @@
     {% else %}
     <div class="results-count">
         {% if result_count > 0 %}
-        <p>Found {{ result_count }} result{% if result_count != 1 %}s{% endif %}</p>
+        <p>Found {{ result_count }} result{% if result_count != 1 %}s{% endif %} in database</p>
         {% else %}
-        <p class="no-results-text">No results found. Try adjusting your filters.</p>
+        <p class="no-results-text">No results found in database.</p>
         {% endif %}
     </div>
 
-    <!-- Results Grid -->
+    <!-- Database Results Grid -->
     {% if results %}
     <div class="results-grid">
         {% for anime in results %}
@@ -110,13 +117,31 @@
                     No synopsis available.
                     {% endif %}
                 </p>
-                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View
-                    Details</a>
+                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View Details</a>
             </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
     {% endif %}
+
+    <!-- Jikan API Results Section -->
+    {% if search_query %}
+    <div class="jikan-section" id="jikanSection">
+        <div class="jikan-header">
+            <h2 class="jikan-title">
+                Results from MyAnimeList
+                <span class="jikan-badge">Jikan API</span>
+            </h2>
+        </div>
+        <div id="jikanResults">
+            <div class="jikan-loading">
+                <span class="spinner"></span> Searching MyAnimeList...
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+
 {% endblock %}

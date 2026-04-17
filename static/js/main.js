@@ -303,6 +303,12 @@ function initializeSearchPage() {
     
     console.log('Initializing Jikan search for:', searchQuery);
     
+    // Show skeleton cards immediately for perceived speed
+    showSkeletonCards();
+    
+    // Start fetching results
+    fetchJikanResults();
+    
     async function fetchJikanResults() {
         try {
             const response = await fetch(`/api/jikan/search?q=${encodeURIComponent(searchQuery)}&limit=12`);
@@ -317,6 +323,25 @@ function initializeSearchPage() {
             console.error('Jikan error:', error);
             jikanResults.innerHTML = '<div class="jikan-error">Failed to search MyAnimeList</div>';
         }
+    }
+    
+    function showSkeletonCards() {
+        let html = '<div class="jikan-grid">';
+        for (let i = 0; i < 6; i++) { // Show 6 skeleton cards
+            html += `
+                <div class="jikan-card skeleton">
+                    <div class="jikan-card-image skeleton-image"></div>
+                    <div class="jikan-card-info">
+                        <div class="jikan-card-title skeleton-text"></div>
+                        <div class="jikan-card-meta skeleton-text"></div>
+                        <div class="jikan-card-actions">
+                            <div class="skeleton-button"></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        html += '</div>';
+        jikanResults.innerHTML = html;
     }
     
     function displayJikanResults(results) {
@@ -410,7 +435,7 @@ function initializeRecommendationsPage() {
         this.textContent = '🔄 Refreshing...';
         
         try {
-            const response = await fetch('/api/recommendations/refresh', { method: 'POST' });
+            const response = await fetch('/recommendations/refresh', { method: 'POST' });
             
             if (response.ok) {
                 alert('Recommendations refreshed!');
@@ -434,7 +459,7 @@ document.getElementById('refreshBtn')?.addEventListener('click', async function(
     this.disabled = true;
     
     try {
-        const response = await fetch('/api/recommendations/refresh', {
+        const response = await fetch('/recommendations/refresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
