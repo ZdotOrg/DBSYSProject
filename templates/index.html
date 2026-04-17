@@ -2,50 +2,56 @@
 
 {% block title %}Home - Anime Tracker{% endblock %}
 
+<!-- PAGE SPECIFIC CSS -->
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="home-section">
     <h1 class="section-title">Top Rated Anime</h1>
-    
+
     {% if error %}
-        <div class="error-message">
-            <p>Error loading anime: {{ error }}</p>
-        </div>
+    <div class="error-message">
+        <p>Error loading anime: {{ error }}</p>
+    </div>
     {% elif anime_list %}
-        <div class="anime-scroll-container">
-            {% for anime in anime_list[:5] %}
-            <div class="anime-card">
-                <div class="anime-image">
-                    {% if anime.image_url %}
-                        <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
-                    {% else %}
-                        <div class="no-image">No Image</div>
+    <div class="anime-scroll-container">
+        {% for anime in anime_list[:5] %}
+        <div class="anime-card">
+            <div class="anime-image">
+                {% if anime.image_url %}
+                <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+                {% else %}
+                <div class="no-image">No Image</div>
+                {% endif %}
+            </div>
+            <div class="anime-info">
+                <h3 class="anime-title">{{ anime.title }}</h3>
+                <div class="anime-meta">
+                    <span class="anime-score">⭐ {{ anime.score }}</span>
+                    <span class="anime-type">{{ anime.type }}</span>
+                    {% if anime.episodes %}
+                    <span class="anime-episodes">{{ anime.episodes }} eps</span>
                     {% endif %}
                 </div>
-                <div class="anime-info">
-                    <h3 class="anime-title">{{ anime.title }}</h3>
-                    <div class="anime-meta">
-                        <span class="anime-score">⭐ {{ anime.score }}</span>
-                        <span class="anime-type">{{ anime.type }}</span>
-                        {% if anime.episodes %}
-                        <span class="anime-episodes">{{ anime.episodes }} eps</span>
-                        {% endif %}
-                    </div>
-                    <p class="anime-synopsis">
-                        {% if anime.synopsis %}
-                            {{ anime.synopsis[:150] }}{% if anime.synopsis|length > 150 %}...{% endif %}
-                        {% else %}
-                            No synopsis available.
-                        {% endif %}
-                    </p>
-                    <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View Details</a>
-                </div>
+                <p class="anime-synopsis">
+                    {% if anime.synopsis %}
+                    {{ anime.synopsis[:150] }}{% if anime.synopsis|length > 150 %}...{% endif %}
+                    {% else %}
+                    No synopsis available.
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View
+                    Details</a>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <div class="no-results">
-            <p>No anime found in the database.</p>
-        </div>
+    <div class="no-results">
+        <p>No anime found in the database.</p>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

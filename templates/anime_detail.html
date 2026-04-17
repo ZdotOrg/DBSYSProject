@@ -2,6 +2,10 @@
 
 {% block title %}{{ anime.title }} - Anime Tracker{% endblock %}
 
+{%block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/anime_detail.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="anime-detail-section">
     <!-- Hero Section -->
@@ -10,23 +14,23 @@
         <div class="hero-background" style="background-image: url('{{ anime.image_url }}');"></div>
         {% endif %}
         <div class="hero-overlay"></div>
-        
+
         <div class="hero-content">
             <div class="hero-poster">
                 {% if anime.image_url %}
-                    <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+                <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
                 {% else %}
-                    <div class="no-image-large">No Image</div>
+                <div class="no-image-large">No Image</div>
                 {% endif %}
             </div>
-            
+
             <div class="hero-info">
                 <h1 class="detail-title">{{ anime.title }}</h1>
-                
+
                 {% if anime.title_english and anime.title_english != anime.title %}
                 <p class="detail-title-alt">{{ anime.title_english }}</p>
                 {% endif %}
-                
+
                 <div class="detail-meta-row">
                     {% if anime.score %}
                     <div class="detail-score-big">
@@ -35,16 +39,16 @@
                     </div>
                     {% endif %}
                 </div>
-                
+
                 <div class="detail-tags">
                     {% if anime.type %}
                     <span class="tag tag-type">{{ anime.type }}</span>
                     {% endif %}
-                    
+
                     {% if anime.status %}
                     <span class="tag tag-status">{{ anime.status }}</span>
                     {% endif %}
-                    
+
                     {% if anime.episodes %}
                     <span class="tag tag-episodes">{{ anime.episodes }} Episodes</span>
                     {% endif %}
@@ -52,7 +56,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Main Content -->
     <div class="detail-container">
         <!-- Left Column: Synopsis -->
@@ -66,27 +70,27 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <!-- Right Sidebar: Basic Info -->
         <div class="detail-sidebar">
             <div class="detail-card">
                 <h3 class="sidebar-title">Information</h3>
-                
+
                 <div class="info-row">
                     <span class="info-label">Type:</span>
                     <span class="info-value">{{ anime.type or 'Unknown' }}</span>
                 </div>
-                
+
                 <div class="info-row">
                     <span class="info-label">Episodes:</span>
                     <span class="info-value">{{ anime.episodes or 'Unknown' }}</span>
                 </div>
-                
+
                 <div class="info-row">
                     <span class="info-label">Status:</span>
                     <span class="info-value">{{ anime.status or 'Unknown' }}</span>
                 </div>
-                
+
                 {% if anime.season and anime.year %}
                 <div class="info-row">
                     <span class="info-label">Premiered:</span>
@@ -94,7 +98,7 @@
                 </div>
                 {% endif %}
             </div>
-            
+
             <!-- Genres -->
             {% if genres %}
             <div class="detail-card">

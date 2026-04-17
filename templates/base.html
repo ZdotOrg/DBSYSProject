@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Anime Tracker{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <!-- GLOBAL CSS  -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+
+
+    <!-- PAGE SPECIFIC CSS -->
+    {% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    {% endblock %}
 </head>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
@@ -21,17 +34,20 @@
             </div>
         </div>
     </nav>
- 
+
     <!-- Main Content -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
- 
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <p>&copy; 2024 Anime Tracker. All rights reserved.</p>
+            <p>&copy; 2026 Anime Tracker. All rights reserved.</p>
         </div>
     </footer>
+
+    {% block extra_js %}{% endblock %}
 </body>
+
 </html>
