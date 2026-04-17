@@ -1,0 +1,154 @@
+/* ============================================================
+  CSS for login.html, register.html
+   ============================================================ */
+
+.auth-section {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.auth-card {
+    background-color: #1a1a1a;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Header */
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    font-size: 0.95rem;
+    color: #999999;
+}
+
+/* Form */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #cccccc;
+}
+
+/* Reuse existing .form-input styles; add specifics here if needed */
+.auth-card .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #2d2d2d;
+    border: 2px solid #404040;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.auth-card .form-input:focus {
+    outline: none;
+    border-color: #ffd700;
+}
+
+.auth-card .form-input::placeholder {
+    color: #666666;
+}
+
+/* Submit Button */
+.auth-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #ffd700;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.auth-btn:hover {
+    background-color: #ffed4e;
+    transform: translateY(-1px);
+}
+
+/* Flash alerts */
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.alert-error {
+    background-color: rgba(220, 53, 69, 0.15);
+    border: 1px solid #dc3545;
+    color: #ff6b7a;
+}
+
+.alert-success {
+    background-color: rgba(46, 204, 113, 0.15);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.alert-info {
+    background-color: rgba(74, 144, 226, 0.15);
+    border: 1px solid #4a90e2;
+    color: #4a90e2;
+}
+
+/* Footer link */
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #999999;
+}
+
+.auth-link {
+    color: #ffd700;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+    color: #ffed4e;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-title {
+        font-size: 1.6rem;
+    }
+}

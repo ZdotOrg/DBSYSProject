@@ -37,6 +37,7 @@ def create_app(config_class='development'):
     from app.routes.main import main_bp
     from app.routes.watchlist import watchlist_bp
     from app.routes.recommendations import recommendations_bp
+    from app.routes.auth import auth_bp
     from jikan.live_search import jikan_bp
     from jikan.fetch_details import details_bp
 
@@ -44,6 +45,7 @@ def create_app(config_class='development'):
     app.register_blueprint(main_bp)
     app.register_blueprint(watchlist_bp)
     app.register_blueprint(recommendations_bp)
+    app.register_blueprint(auth_bp)
     app.register_blueprint(jikan_bp, url_prefix='/api/jikan')
     app.register_blueprint(details_bp, url_prefix='/api/jikan/details')
 

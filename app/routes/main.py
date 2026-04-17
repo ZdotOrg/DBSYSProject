@@ -1,8 +1,23 @@
 """
 Main application routes
 """
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session
 from app.database import query_db, execute_db
+from functools import wraps
+
+# AUTHENTICATION DECORATOR
+
+def login_required(f):
+    """Decorator to require login for certain routes"""
+   
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('user_id'):
+            flash('Please log in to access this page.', 'error')
+            return redirect(url_for('auth.login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 # Create blueprint
 main_bp = Blueprint('main', __name__)
@@ -135,8 +150,12 @@ def watchlist():
     try:
         # For now, using a hardcoded test user (user_id = 1)
         # In Week 3, this will use session/authentication
-        user_id = 1
+                # Get user_id from session
+        user_id = session.get('user_id')
         
+        if not user_id:
+            flash('Please log in to view your watchlist.', 'warning')
+            return redirect(url_for('auth.login'))
         # Get user's watchlist with anime details
         watchlist_items = query_db("""
             SELECT 
