@@ -274,6 +274,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- ============================================================
 -- HELPER QUERY: Get User's Top Preferences Summary
 -- ============================================================
@@ -286,44 +287,48 @@ RETURNS TABLE (
     rating_count INTEGER
 ) AS $$
 BEGIN
+    -- Get top genres
     RETURN QUERY
     SELECT 
         'Genre'::VARCHAR(50) AS preference_type,
-        genre_name::VARCHAR(255) AS preference_name,
-        weighted_score,
-        rating_count
-    FROM calculate_user_genre_preferences(p_user_id)
-    ORDER BY weighted_score DESC
+        gp.genre_name::VARCHAR(255) AS preference_name,
+        gp.weighted_score,
+        gp.rating_count
+    FROM calculate_user_genre_preferences(p_user_id) gp
+    ORDER BY gp.weighted_score DESC
     LIMIT 3;
     
+    -- Get top themes
     RETURN QUERY
     SELECT 
         'Theme'::VARCHAR(50) AS preference_type,
-        theme_name::VARCHAR(255) AS preference_name,
-        weighted_score,
-        rating_count
-    FROM calculate_user_theme_preferences(p_user_id)
-    ORDER BY weighted_score DESC
+        tp.theme_name::VARCHAR(255) AS preference_name,
+        tp.weighted_score,
+        tp.rating_count
+    FROM calculate_user_theme_preferences(p_user_id) tp
+    ORDER BY tp.weighted_score DESC
     LIMIT 3;
     
+    -- Get top demographics
     RETURN QUERY
     SELECT 
         'Demographic'::VARCHAR(50) AS preference_type,
-        demographic_name::VARCHAR(255) AS preference_name,
-        weighted_score,
-        rating_count
-    FROM calculate_user_demographic_preferences(p_user_id)
-    ORDER BY weighted_score DESC
+        dp.demographic_name::VARCHAR(255) AS preference_name,
+        dp.weighted_score,
+        dp.rating_count
+    FROM calculate_user_demographic_preferences(p_user_id) dp
+    ORDER BY dp.weighted_score DESC
     LIMIT 2;
     
+    -- Get top studios
     RETURN QUERY
     SELECT 
         'Studio'::VARCHAR(50) AS preference_type,
-        studio_name::VARCHAR(255) AS preference_name,
-        weighted_score,
-        rating_count
-    FROM calculate_user_studio_preferences(p_user_id)
-    ORDER BY weighted_score DESC
+        sp.studio_name::VARCHAR(255) AS preference_name,
+        sp.weighted_score,
+        sp.rating_count
+    FROM calculate_user_studio_preferences(p_user_id) sp
+    ORDER BY sp.weighted_score DESC
     LIMIT 3;
 END;
 $$ LANGUAGE plpgsql;

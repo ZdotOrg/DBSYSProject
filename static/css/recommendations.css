@@ -156,6 +156,75 @@
     color: #ffd700;
 }
 
+/* Match badge styling */
+.match-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.section-subtitle {
+    color: #888;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.refresh-link {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.refresh-link:hover {
+    color: #764ba2;
+}
+
+.refresh-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.empty-state h2 {
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.empty-state-text {
+    color: #aaa;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #888;
+    margin-bottom: 25px;
+}
+
+/* Ensure anime image container has position relative for badge */
+.anime-image {
+    position: relative;
+}
+
 @media (max-width: 768px) {
     .preference-grid {
         grid-template-columns: 1fr;

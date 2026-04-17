@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
 {% block title %}Recommendations - Anime Tracker{% endblock %}
+
 <!-- PAGE SPECIFIC CSS -->
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/recommendations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+<!-- Page-specific JavaScript -->
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +20,7 @@
     {% if error %}
     <div class="error-message">
         <p>Error loading recommendations: {{ error }}</p>
-        <p>Make sure you've run the recommendation_queries.sql file in your database!</p>
+        <p>Make sure you've rated some anime first!</p>
     </div>
     {% elif not has_ratings %}
     <!-- Empty State: No ratings yet -->
@@ -24,103 +31,25 @@
         <a href="{{ url_for('main.search') }}" class="form-button">Browse Anime</a>
         <a href="{{ url_for('main.watchlist') }}" class="form-button" style="margin-left: 10px;">Go to Watchlist</a>
     </div>
-    {% else %}
-    <!-- Preference Summary -->
-    <div class="preference-summary">
-        <h2>Your Taste Profile</h2>
-        <p class="subtitle">Based on {{ ratings_count }} ratings</p>
-
-        <div class="preference-grid">
-            <!-- Top Genres -->
-            {% if top_genres %}
-            <div class="preference-card">
-                <h3>Favorite Genres</h3>
-                <div class="preference-list">
-                    {% for genre in top_genres %}
-                    <div class="preference-item">
-                        <span class="preference-name">{{ genre.preference_name }}</span>
-                        <span class="preference-score">⭐ {{ "%.1f"|format(genre.weighted_score) }}</span>
-                        <span class="preference-count">{{ genre.rating_count }} rated</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Top Themes -->
-            {% if top_themes %}
-            <div class="preference-card">
-                <h3>Favorite Themes</h3>
-                <div class="preference-list">
-                    {% for theme in top_themes %}
-                    <div class="preference-item">
-                        <span class="preference-name">{{ theme.preference_name }}</span>
-                        <span class="preference-score">⭐ {{ "%.1f"|format(theme.weighted_score) }}</span>
-                        <span class="preference-count">{{ theme.rating_count }} rated</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Top Demographics -->
-            {% if top_demographics %}
-            <div class="preference-card">
-                <h3>Target Audience</h3>
-                <div class="preference-list">
-                    {% for demo in top_demographics %}
-                    <div class="preference-item">
-                        <span class="preference-name">{{ demo.preference_name }}</span>
-                        <span class="preference-score">⭐ {{ "%.1f"|format(demo.weighted_score) }}</span>
-                        <span class="preference-count">{{ demo.rating_count }} rated</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Top Studios -->
-            {% if top_studios %}
-            <div class="preference-card">
-                <h3>Favorite Studios</h3>
-                <div class="preference-list">
-                    {% for studio in top_studios %}
-                    <div class="preference-item">
-                        <span class="preference-name">{{ studio.preference_name }}</span>
-                        <span class="preference-score">⭐ {{ "%.1f"|format(studio.weighted_score) }}</span>
-                        <span class="preference-count">{{ studio.rating_count }} rated</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        <button id="refreshBtn" class="form-button" style="margin-top: 20px;">
-            🔄 Refresh Recommendations
-        </button>
+    {% elif recommendations %}
+    <!-- Subtitle with rating count and refresh button -->
+    <div class="section-header">
+        <p class="section-subtitle">Based on {{ ratings_count }} ratings</p>
+        <button id="refreshBtn" class="refresh-button">🔄 Refresh Recommendations</button>
     </div>
 
-    <!-- Recommendations Grid -->
-    <div class="recommendations-header">
-        <h2>Anime You Might Like</h2>
-        <p class="subtitle">Personalized picks based on your ratings</p>
-    </div>
-
-    {% if recommendations %}
-    <div class="results-grid">
+    <!-- Horizontal scroll container matching home page -->
+    <div class="anime-scroll-container">
         {% for anime in recommendations %}
-        <div class="anime-card" data-anime-id="{{ anime.anime_id }}">
+        <div class="anime-card">
             <div class="anime-image">
                 {% if anime.image_url %}
                 <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
                 {% else %}
                 <div class="no-image">No Image</div>
                 {% endif %}
-                <!-- Recommendation Score Badge -->
-                <div class="recommendation-badge" title="Match Score">
-                    {{ "%.1f"|format(anime.recommendation_score) }}% Match
-                </div>
+                <!-- Match percentage badge -->
+                <div class="match-badge">{{ "%.0f"|format(anime.recommendation_score) }}% Match</div>
             </div>
             <div class="anime-info">
                 <h3 class="anime-title">{{ anime.title }}</h3>
@@ -135,36 +64,14 @@
                     <span class="anime-episodes">{{ anime.episodes }} eps</span>
                     {% endif %}
                 </div>
-
-                <!-- Score Breakdown -->
-                <div class="score-breakdown">
-                    <div class="score-bar">
-                        <span class="score-label">Genre</span>
-                        <div class="score-bar-container">
-                            <div class="score-bar-fill" style="width: {{ (anime.genre_score / 10 * 100)|int }}%"></div>
-                        </div>
-                        <span class="score-value">{{ "%.1f"|format(anime.genre_score) }}</span>
-                    </div>
-                    {% if anime.theme_score > 0 %}
-                    <div class="score-bar">
-                        <span class="score-label">Theme</span>
-                        <div class="score-bar-container">
-                            <div class="score-bar-fill" style="width: {{ (anime.theme_score / 10 * 100)|int }}%"></div>
-                        </div>
-                        <span class="score-value">{{ "%.1f"|format(anime.theme_score) }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-
                 <p class="anime-synopsis">
                     {% if anime.synopsis %}
-                    {{ anime.synopsis[:120] }}{% if anime.synopsis|length > 120 %}...{% endif %}
+                    {{ anime.synopsis[:150] }}{% if anime.synopsis|length > 150 %}...{% endif %}
                     {% else %}
                     No synopsis available.
                     {% endif %}
                 </p>
-                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View
-                    Details</a>
+                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View Details</a>
             </div>
         </div>
         {% endfor %}
@@ -172,41 +79,10 @@
     {% else %}
     <div class="no-results">
         <p>No recommendations found. Try rating more anime!</p>
+        <a href="{{ url_for('main.search') }}" class="form-button">Browse Anime</a>
     </div>
-    {% endif %}
     {% endif %}
 </div>
 
 
-
-<script>
-    // Refresh recommendations button
-    document.getElementById('refreshBtn')?.addEventListener('click', async function () {
-        const btn = this;
-        btn.disabled = true;
-        btn.textContent = '🔄 Refreshing...';
-
-        try {
-            const response = await fetch('/api/recommendations/refresh', {
-                method: 'POST'
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Recommendations refreshed! Reloading page...');
-                location.reload();
-            } else {
-                alert('Error: ' + data.error);
-                btn.disabled = false;
-                btn.textContent = '🔄 Refresh Recommendations';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error refreshing recommendations');
-            btn.disabled = false;
-            btn.textContent = '🔄 Refresh Recommendations';
-        }
-    });
-</script>
 {% endblock %}
