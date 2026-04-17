@@ -25,6 +25,7 @@ OPTIONAL DATABASE TABLES:
 INTEGRATION:
     Add to your app/__init__.py:
     
+
     from jikan_integration.fetch_details import details_bp
     app.register_blueprint(details_bp)
 """
@@ -502,7 +503,7 @@ def api_anime_full_details(mal_id):
 # ============================================================
 
 """
-If you want to cache extended details in your database, run this SQL:
+
 
 -- Characters table
 CREATE TABLE IF NOT EXISTS anime_characters (
