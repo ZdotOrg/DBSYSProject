@@ -579,3 +579,75 @@
         justify-content: center;
     }
 }
+
+
+/* ADD TO WATCHLIST BUTTON *//* Watchlist Button */
+.watchlist-actions {
+    margin-top: 1.5rem;
+}
+
+.btn-watchlist {
+    padding: 0.875rem 2rem;
+    background-color: #ffd700;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+}
+
+.btn-watchlist:hover {
+    background-color: #ffed4e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.btn-watchlist:active {
+    transform: translateY(0);
+}
+
+/* Success state when added to watchlist */
+.btn-watchlist.added {
+    background-color: #2ecc71;
+    color: #ffffff;
+}
+
+.btn-watchlist.added:hover {
+    background-color: #27ae60;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+/* Disabled state */
+.btn-watchlist:disabled {
+    background-color: #555555;
+    color: #999999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.watchlist-icon {
+    transition: transform 0.3s ease;
+}
+
+.btn-watchlist:hover .watchlist-icon {
+    transform: rotate(90deg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .watchlist-actions {
+        text-align: center;
+    }
+    
+    .btn-watchlist {
+        width: 100%;
+        justify-content: center;
+    }
+}
