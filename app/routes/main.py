@@ -25,27 +25,35 @@ main_bp = Blueprint('main', __name__)
 # READ OPERATION
 @main_bp.route('/')
 def index():
-    """Home page - displays featured/popular anime"""
-    try:
-        # Get top 12 anime by score for homepage
-        anime_list = query_db("""
-            SELECT 
-                anime_id, mal_id, title, title_english, 
-                type, episodes, score, image_url, synopsis
-            FROM anime
-            WHERE score IS NOT NULL
-            ORDER BY score DESC, popularity ASC
-            LIMIT 12
-        """)
-        
-        return render_template('index.html', anime_list=anime_list)
+
     
-    except Exception as e:
-        print(f"Error loading home page: {e}")
-        return render_template('index.html', anime_list=[], error=str(e))
+    top_rated = query_db("""
+        SELECT anime_id, title, image_url, score, type, episodes
+        FROM anime WHERE score > 0 ORDER BY score DESC LIMIT 10
+    """)
+
+    
+    upcoming_anime = query_db("""
+        SELECT anime_id, title, image_url, score, type, episodes
+        FROM anime WHERE status = 'Not yet aired' ORDER BY popularity ASC LIMIT 10
+    """)
+    
+    popular_anime = query_db("""
+        SELECT anime_id, title, image_url, score, type, episodes
+        FROM anime WHERE popularity > 0 ORDER BY popularity ASC LIMIT 10
+    """)
+    
+    return render_template('index.html',
+                         top_rated=top_rated,
+                      
+                         upcoming_anime=upcoming_anime,
+                         popular_anime=popular_anime,
+                         )
+
 
 
 #READ OPERATION
+# READ OPERATION
 @main_bp.route('/search')
 def search():
     """Search page - search anime by title, genre, etc."""
@@ -57,12 +65,12 @@ def search():
         status_filter = request.args.get('status', '')
         sort_by = request.args.get('sort', 'score_desc')
         
-        # Base query
+        # Base query - ADD a.popularity to SELECT
         query = """
             SELECT DISTINCT
                 a.anime_id, a.mal_id, a.title, a.title_english,
                 a.type, a.episodes, a.score, a.image_url, a.synopsis,
-                a.status, a.year
+                a.status, a.year, a.popularity
             FROM anime a
             LEFT JOIN anime_genres ag ON a.anime_id = ag.anime_id
             LEFT JOIN genres g ON ag.genre_id = g.genre_id
@@ -99,7 +107,7 @@ def search():
         elif sort_by == 'title_asc':
             query += " ORDER BY a.title ASC"
         elif sort_by == 'popularity':
-            query += " ORDER BY a.popularity ASC"
+            query += " ORDER BY a.popularity ASC NULLS LAST"
         else:
             query += " ORDER BY a.score DESC NULLS LAST"
         
@@ -141,7 +149,6 @@ def search():
                              statuses=[],
                              result_count=0,
                              error=str(e))
-
 
 # READ OPERATION
 @main_bp.route('/watchlist')
@@ -252,6 +259,7 @@ def recommendations():
     """Recommendations page - personalized anime recommendations"""
     # Placeholder for Week 2-3 advanced algorithm
     return render_template('recommendations.html', recommendations=[])
+
 
 
 # ============================================================

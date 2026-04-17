@@ -2,56 +2,122 @@
 
 {% block title %}Home - Anime Tracker{% endblock %}
 
-<!-- PAGE SPECIFIC CSS -->
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="home-section">
-    <h1 class="section-title">Top Rated Anime</h1>
-
-    {% if error %}
-    <div class="error-message">
-        <p>Error loading anime: {{ error }}</p>
-    </div>
-    {% elif anime_list %}
-    <div class="anime-scroll-container">
-        {% for anime in anime_list[:5] %}
-        <div class="anime-card">
-            <div class="anime-image">
-                {% if anime.image_url %}
-                <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
-                {% else %}
-                <div class="no-image">No Image</div>
-                {% endif %}
-            </div>
-            <div class="anime-info">
-                <h3 class="anime-title">{{ anime.title }}</h3>
-                <div class="anime-meta">
-                    <span class="anime-score">⭐ {{ anime.score }}</span>
-                    <span class="anime-type">{{ anime.type }}</span>
-                    {% if anime.episodes %}
-                    <span class="anime-episodes">{{ anime.episodes }} eps</span>
-                    {% endif %}
-                </div>
-                <p class="anime-synopsis">
-                    {% if anime.synopsis %}
-                    {{ anime.synopsis[:150] }}{% if anime.synopsis|length > 150 %}...{% endif %}
-                    {% else %}
-                    No synopsis available.
-                    {% endif %}
-                </p>
-                <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="view-details">View
-                    Details</a>
-            </div>
+<div class="home-container">
+    
+    <!-- TOP RATED ALL TIME -->
+    <section class="anime-section">
+        <div class="section-header">
+            <h2 class="section-title"> Top Rated All Time</h2>
+            <a href="{{ url_for('main.search') }}?sort=score_desc" class="view-all-btn">View All →</a>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="no-results">
-        <p>No anime found in the database.</p>
-    </div>
-    {% endif %}
+        
+        <div class="anime-scroll-container">
+            {% if top_rated %}
+                {% for anime in top_rated[:10] %}
+                <div class="anime-card">
+                    <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="anime-card-link">
+                        <div class="anime-image">
+                            {% if anime.image_url %}
+                            <img src="{{ anime.image_url }}" alt="{{ anime.title }}" loading="lazy">
+                            {% else %}
+                            <div class="no-image">🎬 No Image</div>
+                            {% endif %}
+                            {% if anime.score %}
+                            <div class="anime-score-badge">⭐ {{ "%.1f"|format(anime.score) }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="anime-info">
+                            <h3 class="anime-title">{{ anime.title }}</h3>
+                            <div class="anime-meta">
+                                <span>{{ anime.type or 'Unknown' }}</span>
+                                {% if anime.episodes %}<span>{{ anime.episodes }} eps</span>{% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </section>
+
+    
+
+    <!-- UPCOMING ANIME -->
+    <section class="anime-section">
+        <div class="section-header">
+            <h2 class="section-title"> Upcoming Anime</h2>
+            <a href="{{ url_for('main.search') }}?status=Not yet aired" class="view-all-btn">View All →</a>
+        </div>
+        
+        <div class="anime-scroll-container">
+            {% if upcoming_anime %}
+                {% for anime in upcoming_anime[:10] %}
+                <div class="anime-card">
+                    <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="anime-card-link">
+                        <div class="anime-image">
+                            {% if anime.image_url %}
+                            <img src="{{ anime.image_url }}" alt="{{ anime.title }}" loading="lazy">
+                            {% else %}
+                            <div class="no-image">🎬 No Image</div>
+                            {% endif %}
+                            {% if anime.score %}
+                            <div class="anime-score-badge">⭐ {{ "%.1f"|format(anime.score) }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="anime-info">
+                            <h3 class="anime-title">{{ anime.title }}</h3>
+                            <div class="anime-meta">
+                                <span>{{ anime.type or 'Unknown' }}</span>
+                                {% if anime.episodes %}<span>{{ anime.episodes }} eps</span>{% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- MOST POPULAR -->
+    <section class="anime-section">
+        <div class="section-header">
+            <h2 class="section-title"> Most Popular</h2>
+            <a href="{{ url_for('main.search') }}?sort=popularity" class="view-all-btn">View All →</a>
+        </div>
+        
+        <div class="anime-scroll-container">
+            {% if popular_anime %}
+                {% for anime in popular_anime[:10] %}
+                <div class="anime-card">
+                    <a href="{{ url_for('main.anime_detail', anime_id=anime.anime_id) }}" class="anime-card-link">
+                        <div class="anime-image">
+                            {% if anime.image_url %}
+                            <img src="{{ anime.image_url }}" alt="{{ anime.title }}" loading="lazy">
+                            {% else %}
+                            <div class="no-image">🎬 No Image</div>
+                            {% endif %}
+                            {% if anime.score %}
+                            <div class="anime-score-badge">⭐ {{ "%.1f"|format(anime.score) }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="anime-info">
+                            <h3 class="anime-title">{{ anime.title }}</h3>
+                            <div class="anime-meta">
+                                <span>{{ anime.type or 'Unknown' }}</span>
+                                {% if anime.episodes %}<span>{{ anime.episodes }} eps</span>{% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </section>
+
 </div>
 {% endblock %}
