@@ -34,7 +34,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Anime Table
@@ -338,6 +338,3 @@ INSERT INTO demographics (name, mal_id) VALUES
 ('Josei', 43),
 ('Kids', 15);
 
--- ============================================================
--- END OF SCHEMA
--- ============================================================
